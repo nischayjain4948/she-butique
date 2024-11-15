@@ -23,7 +23,7 @@ export default function Dashboard() {
     }
 
     fetchCounts();
-  }, [router]);
+  }, [router, setCounts, setLoading]); // Include all dependencies
 
   const handleNavigate = (path) => {
     router.push(path);

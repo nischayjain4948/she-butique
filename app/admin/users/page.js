@@ -2,7 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import { CircularProgress, Box, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
+import {
+  CircularProgress,
+  Box,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  TextField,
+} from '@mui/material';
 import Navbar from '../Navbar';
 import useAdminAuth from '@/hooks/useAdminAuth';
 import { useRouter } from 'next/navigation';
@@ -33,9 +43,16 @@ export default function UsersPage() {
         setFetchLoading(true);
         const res = await fetch('/api/admin/users');
         const data = await res.json();
-        setUsers(data);
+
+        // Ensure each row has a unique "id" for the DataGrid
+        const processedData = data.map((user, index) => ({
+          ...user,
+          id: user.id || index, // Use existing id or fallback to index
+        }));
+
+        setUsers(processedData);
       } catch (fetchError) {
-        console.error("Failed to fetch users:", fetchError);
+        console.error('Failed to fetch users:', fetchError);
       } finally {
         setFetchLoading(false);
       }
@@ -89,6 +106,7 @@ export default function UsersPage() {
       width: 100,
       getActions: (params) => [
         <GridActionsCellItem
+          key={`edit-${params.id}`}
           icon={<EditIcon />}
           label="Edit"
           onClick={() => handleEditClick(params.row)}
@@ -104,7 +122,9 @@ export default function UsersPage() {
     <>
       <Navbar />
       <Box sx={{ height: 400, width: '100%', padding: 4 }}>
-        <Typography variant="h5" gutterBottom>User Management</Typography>
+        <Typography variant="h5" gutterBottom>
+          User Management
+        </Typography>
 
         {fetchLoading ? (
           <CircularProgress />
@@ -147,8 +167,12 @@ export default function UsersPage() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="secondary">Cancel</Button>
-          <Button onClick={handleUpdateUser} color="primary">Save</Button>
+          <Button onClick={handleClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleUpdateUser} color="primary">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
     </>

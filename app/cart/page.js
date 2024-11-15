@@ -10,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { getSession } from 'next-auth/react'; // Import to get session
+import Image from 'next/image';
 
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart } = useCartStore();

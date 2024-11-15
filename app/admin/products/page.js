@@ -7,6 +7,7 @@ import Navbar from '../Navbar';
 import useAdminAuth from '@/hooks/useAdminAuth';
 import { useRouter } from 'next/navigation';
 import EditIcon from '@mui/icons-material/Edit';
+import Image from 'next/image';
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -48,7 +49,7 @@ export default function ProductsPage() {
 
   const handleEditClick = (product) => {
     setCurrentProduct(product);
-    setUpdatedProductInfo({ name: product.name, price: product.price, category: product.category, image: product.image,  careInstructions: product.careInstructions });
+    setUpdatedProductInfo({ name: product.name, price: product.price, category: product.category, image: product.image, careInstructions: product.careInstructions });
     setOpen(true);
   };
 
@@ -104,7 +105,9 @@ export default function ProductsPage() {
         <img
           src={params.value}
           alt={params.row.name}
-          style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4, cursor: 'pointer' }}
+          width={50}
+          height={50}
+          style={{ objectFit: 'cover', borderRadius: 4, cursor: 'pointer' }}
           onClick={() => handleImageClick(params.value)}
         />
       )
@@ -120,6 +123,7 @@ export default function ProductsPage() {
           icon={<EditIcon />}
           label="Edit"
           onClick={() => handleEditClick(params.row)}
+          key={params.id} // Add unique key
         />,
       ],
     },
@@ -182,8 +186,6 @@ export default function ProductsPage() {
             ))}
           </TextField>
 
-
-
           <TextField
             label="Image URL"
             fullWidth
@@ -193,24 +195,21 @@ export default function ProductsPage() {
             variant="outlined"
           />
 
-
-
-<TextField
-      label="Care Instructions"
-      fullWidth
-      select
-      value={updatedProductInfo.careInstructions || ''}
-      onChange={(e) => setUpdatedProductInfo({ ...updatedProductInfo, careInstructions: e.target.value })}
-      required
-      variant="outlined"
-    >
-      {['Machine Wash', 'Hand Wash Only', 'Dry Clean Only'].map((option) => (
-        <MenuItem key={option} value={option}>
-          {option}
-        </MenuItem>
-      ))}
-    </TextField>
-
+          <TextField
+            label="Care Instructions"
+            fullWidth
+            select
+            value={updatedProductInfo.careInstructions || ''}
+            onChange={(e) => setUpdatedProductInfo({ ...updatedProductInfo, careInstructions: e.target.value })}
+            required
+            variant="outlined"
+          >
+            {['Machine Wash', 'Hand Wash Only', 'Dry Clean Only'].map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">Cancel</Button>
@@ -221,7 +220,7 @@ export default function ProductsPage() {
       {/* Large Image Dialog */}
       <Dialog open={imageDialogOpen} onClose={handleCloseImageDialog}>
         <DialogContent>
-          <img src={selectedImage} alt="Product" style={{ width: '100%', height: 'auto' }} />
+          <Image src={selectedImage} alt="Product" width={500} height={500} style={{ objectFit: 'contain' }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseImageDialog} color="secondary">Close</Button>

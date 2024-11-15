@@ -4,7 +4,7 @@ import crypto from 'crypto';
 
 const razorpay = new Razorpay({
   key_id: 'rzp_test_bMoebitCJCkjwp',
-  key_secret: '50tSsDOOkABWcW3K0cT3KGro',
+  key_secret: '50tSsDOOkABWcW3K0cT3KGro'
 });
 
 export async function POST(req) {

@@ -5,6 +5,7 @@ import { CircularProgress, Typography, Box, TextField, IconButton, Dialog, Dialo
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import useCartStore from './store/useCartStore';
+import Image from 'next/image'; // Import Image from next/image
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -18,7 +19,6 @@ export default function HomePage() {
 
   // Define cache duration in milliseconds (24 hours in this example)
   const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
-``
 
   useEffect(() => {
     const cachedData = localStorage.getItem('products');
@@ -35,7 +35,7 @@ export default function HomePage() {
     } else {
       fetchProducts(); // Fetch data if there's no cache
     }
-  }, []);
+  }, [CACHE_DURATION]);
 
   async function fetchProducts() {
     setLoading(true);
@@ -133,6 +133,8 @@ export default function HomePage() {
                   <img
                     src={product.image}
                     alt={product.name}
+                    width={500} // Set an appropriate width
+                    height={300} // Set an appropriate height
                     className="w-full h-48 object-contain mb-2 rounded bg-gray-100"
                   />
                   <Typography variant="h6" className="font-semibold text-gray-800">
@@ -185,60 +187,50 @@ export default function HomePage() {
         <Dialog open={Boolean(selectedProduct)} onClose={() => setSelectedProduct(null)}>
           <DialogTitle>{selectedProduct.name}</DialogTitle>
           <DialogContent>
-            <img
+            <Image
               src={selectedProduct.image}
               alt={selectedProduct.name}
+              width={500} // Set an appropriate width
+              height={300} // Set an appropriate height
               className="w-full h-50 object-contain mb-2 rounded bg-gray-100"
             />
-            <Typography variant="body1" color="textSecondary">{selectedProduct.description}</Typography>
-            {/* Size Selection */}
-            {selectedProduct.sizes && selectedProduct.sizes.length > 0 && (
-              <FormControl fullWidth margin="normal">
-                <InputLabel>Size</InputLabel>
-                <Select
-                  value={selectedSize}
-                  onChange={(e) => setSelectedSize(e.target.value)}
-                  label="Size"
-                >
-                  {selectedProduct.sizes.map((size, index) => (
-                    <MenuItem key={index} value={size}>
-                      {size}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-            {/* Color Selection */}
-            {selectedProduct.colors && selectedProduct.colors.length > 0 && (
-              <Box className="mt-2">
-                <Typography variant="body2" color="textSecondary">Colors:</Typography>
-                <div className="flex space-x-2">
-                  {selectedProduct.colors.map((color, index) => (
-                    <IconButton
-                      key={index}
-                      onClick={() => setSelectedColor(color)}
-                      style={{
-                        backgroundColor: color,
-                        padding: '10px',
-                        borderRadius: '50%',
-                        border: selectedColor === color ? '3px solid #9333ea' : 'none',
-                      }}
-                    />
-                  ))}
-                </div>
-              </Box>
-            )}
+            <Typography variant="body2" color="textSecondary" className="mb-4">
+              {selectedProduct.description}
+            </Typography>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Size</InputLabel>
+              <Select
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(e.target.value)}
+                label="Size"
+              >
+                {selectedProduct.sizes.map((size) => (
+                  <MenuItem key={size} value={size}>
+                    {size}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Color</InputLabel>
+              <Select
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                label="Color"
+              >
+                {selectedProduct.colors.map((color) => (
+                  <MenuItem key={color} value={color}>
+                    {color}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setSelectedProduct(null)} color="secondary">
               Cancel
             </Button>
-            <Button
-              onClick={handleAddToCart}
-              color="primary"
-              variant="contained"
-              disabled={!selectedSize || !selectedColor || isInCart(selectedProduct.id)}
-            >
+            <Button onClick={handleAddToCart} color="primary" disabled={!selectedSize || !selectedColor}>
               Add to Cart
             </Button>
           </DialogActions>
