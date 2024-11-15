@@ -36,6 +36,7 @@ export const authOptions = {
       }
     })
   ],
+  secret : "ecom_secret",
   pages: {
     signIn: '/auth/signin',  // Custom sign-in page
   },

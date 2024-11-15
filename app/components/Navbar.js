@@ -128,7 +128,7 @@ export default function Navbar() {
               onClick={() => signIn()}
               className="text-white hover:text-yellow-400"
             >
-              Login
+              SignIn
             </button>
           )}
         </div>
