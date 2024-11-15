@@ -1,0 +1,96 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  email           String           @unique
+  password        String
+  fullName        String
+  role            String           @default("user")
+  number          BigInt?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  deliveryAddress Address[]        // Embedded delivery addresses
+  orders          Order[]          // Relation to Order model
+
+  @@map("users")
+}
+
+model Product {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  description      String
+  price            Float
+  image            String
+  category         String
+  quantity         Int
+  clothingType     String
+  specificType     String
+  sizes            String[]
+  colors           String[]
+  material         String?
+  brand            String?
+  careInstructions String?
+  isTrending       Boolean  @default(false)
+  isNewArrival     Boolean  @default(false)
+  keywords         String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  productOrders    ProductOrder[]
+
+  @@map("products")
+}
+
+model ProductOrder {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String   @db.ObjectId
+  productId String   @db.ObjectId
+  quantity  Int
+  price     Float
+  product   Product  @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
+
+  @@map("product_orders")
+}
+
+model Order {
+  id                      String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId                  String    @db.ObjectId
+  products                ProductOrder[]
+  totalAmount             Float
+  deliveryName            String
+  deliveryAddress         String
+  deliveryCity            String
+  deliveryCountry         String
+  deliveryPincode         String
+  deliveryPhone           String
+  deliveryAlternatePhone  String?
+  deliveryLandmark        String?
+  status                  String    @default("Pending")
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  razorpayPaymentId       String?
+  razorpayOrderId         String?
+  razorpaySignature       String?
+  user                    User      @relation(fields: [userId], references: [id])
+
+  @@map("orders")
+}
+
+type Address {
+  name           String
+  address        String
+  city           String
+  country        String
+  pincode        String
+  phone          String
+  alternatePhone String?
+  landmark       String?
+}
