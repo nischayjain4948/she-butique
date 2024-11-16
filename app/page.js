@@ -187,7 +187,7 @@ export default function HomePage() {
         <Dialog open={Boolean(selectedProduct)} onClose={() => setSelectedProduct(null)}>
           <DialogTitle>{selectedProduct.name}</DialogTitle>
           <DialogContent>
-            <Image
+            <img
               src={selectedProduct.image}
               alt={selectedProduct.name}
               width={500} // Set an appropriate width

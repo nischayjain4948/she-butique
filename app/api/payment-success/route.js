@@ -38,13 +38,34 @@ export async function POST(req) {
       const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
       console.log('Calculated totalAmount:', totalAmount);
 
+      console.log('Prisma order.create payload:', {
+        user: { connect: { email: userDetails.email } },
+        totalAmount:parseFloat(totalAmount),
+        deliveryName: userDetails?.name || "",
+        deliveryAddress: userDetails.address,
+        deliveryCity: userDetails.city,
+        deliveryCountry: userDetails.country,
+        deliveryPincode: userDetails.pincode,
+        deliveryPhone: userDetails.phone,
+        deliveryAlternatePhone: userDetails.alternatePhone,
+        deliveryLandmark: userDetails.landmark,
+        status: 'Paid',
+        products: cartItems.map((item) => ({
+          product: { connect: { id: item.id } },
+          quantity: parseInt(item.quantity),
+          price: parseFloat(item.price),
+        })),
+        razorpayPaymentId: razorpay_payment_id,
+        razorpayOrderId: razorpay_order_id,
+        razorpaySignature: razorpay_signature,
+      });
+      
+
       try {
         const order = await prisma.order.create({
           data: {
-            user: {
-              connect: { email: userDetails.email },
-            },
-            totalAmount,
+            user: { connect: { email: userDetails.email } },
+            totalAmount:parseFloat(totalAmount),
             deliveryName: userDetails?.name || "",
             deliveryAddress: userDetails.address,
             deliveryCity: userDetails.city,
@@ -56,24 +77,21 @@ export async function POST(req) {
             status: 'Paid',
             products: {
               create: cartItems.map((item) => ({
-                product: {
-                  connect: { id: item.id },
-                },
+                product: { connect: { id: item.id } },
                 quantity: parseInt(item.quantity),
                 price: parseFloat(item.price),
               })),
             },
-
-              razorpayPaymentId: razorpay_payment_id,
-              razorpayOrderId: razorpay_order_id,
-              razorpaySignature: razorpay_signature,
+            razorpayPaymentId: razorpay_payment_id,
+            razorpayOrderId: razorpay_order_id,
+            razorpaySignature: razorpay_signature,
           },
         });
-
+        
         console.log('Order created successfully:', order);
         return new Response(JSON.stringify({ success: true, orderId: order.id }), { status: 200 });
       } catch (prismaError) {
-        console.error('Prisma error:', prismaError);
+        console.error('Prisma error:', prismaError , prismaError.meta);
         return new Response(JSON.stringify({ success: false, message: 'Failed to create order in database' }), { status: 500 });
       }
 
